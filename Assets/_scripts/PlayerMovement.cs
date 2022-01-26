@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
         dirX = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(moveSpeed*dirX, rb.velocity.y);
 
-        if(Input.GetButtonDown("Jump") && IsGrounded() )
+        if(Input.GetButtonDown("Jump"))// && IsGrounded() )
         {   
             jumpSoundEffect.Play();
             rb.velocity = new Vector2(0,jumpForce);

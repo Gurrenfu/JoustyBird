@@ -49,3 +49,6 @@ TagManager:
   - name: Terrain
     uniqueID: 1514215943
     locked: 0
+  - name: Overlay
+    uniqueID: 3274942837
+    locked: 0

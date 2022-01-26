@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.Linq;
 
 public class TileMapManager : MonoBehaviour
 {
@@ -10,59 +9,59 @@ public class TileMapManager : MonoBehaviour
     [SerializeField] private Tilemap tilemap;
     [SerializeField] private Tile tile; 
 
+    [SerializeField] private int minGap = 4;
+    [SerializeField] private int maxGap = 10;
+    [SerializeField] private int towerWidth = 2;
+
+    [SerializeField] private int startingOffset = 3;
+    [SerializeField] private int minTowerSpacing = 3;
+    [SerializeField] private int maxTowerSpacing = 7;
+    
+    private int previousTowerX; 
+    private Vector3Int towerLocation = Vector3Int.zero;
     private Vector3Int location; 
-   
     private int tileMapHeight;
 
     private void Start() {
-
-      tileMapHeight = tilemap.cellBounds.yMax*2;
-      Debug.Log(tileMapHeight);
-      MakeTowers();
-      MakeTowers();
-      MakeTowers();
-    
-    }
-
-    void Update()
-    {
-      if(Input.GetMouseButtonDown(0)){
-          Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-          location = tilemap.WorldToCell(mousePosition);
-          tilemap.SetTile(location, tile);
+      tileMapHeight = tilemap.size.y;
+      previousTowerX = tilemap.origin.x + startingOffset;
+      towerLocation = new Vector3Int(0, tilemap.origin.y ,0 );
+      int xMaxLimint = tilemap.size.x + tilemap.origin.x - towerWidth;
+      
+            
+      for(int p = previousTowerX; p < xMaxLimint; p = getNextTowerX())
+      { 
+        towerLocation.x = p;
+        MakeTower(towerLocation, towerWidth);
+        previousTowerX = p+towerWidth;
       }
     }
 
-    void MakeTowers(){
-      Vector3Int cellLocation = SelectRandomCellX(tilemap.cellBounds, tilemap.cellBounds.yMin);
-    
-      int gapHeight = Random.Range(4, 10);
+
+    int getNextTowerX(){
+      return  previousTowerX + Random.Range(minTowerSpacing, maxTowerSpacing+1);
+    }
+
+    void MakeTower(Vector3Int origin, int width){
+      int gapHeight = Random.Range(minGap, maxGap);
       int gapLowerLimit = Random.Range(1,  tileMapHeight-gapHeight-1);
       int gapUpperLimit = gapLowerLimit+gapHeight;
-      
-      for (int i = 0; i <  tileMapHeight; i++)
+      for (int c = 0; c <=  width; c++)
       {
-        if( i > gapLowerLimit && i <= gapUpperLimit)
-          continue;
-        location = cellLocation + new Vector3Int (0,i,0);
-        tilemap.SetTile(location, tile);  
+          for (int i = 0; i <  tileMapHeight; i++)
+          {
+            Debug.Log("Running: " + tileMapHeight);
+            if( i > gapLowerLimit && i <= gapUpperLimit)
+              continue;
+            location = origin + new Vector3Int (c,i,0);
+            tilemap.SetTile(location, tile);  
+          }
       }
     }
 
-  
-    Vector3Int SelectRandomCell(BoundsInt bounds){
-      return SelectRandomCellX(bounds) + SelectRandomCellY(bounds);
-    }
 
-    Vector3Int SelectRandomCellX(BoundsInt bounds, int yCol = 0){
-      return new Vector3Int(Random.Range(bounds.xMin, bounds.xMax),yCol,0);
-    }
-
-    Vector3Int SelectRandomCellY(BoundsInt bounds, int xRow = 0){
-      return new Vector3Int(xRow,Random.Range(bounds.yMin, bounds.yMax),0);
-    }
+    //Todo 
+    //determine cells before caling set tile
+    //add colliders at the end instead of each step.
+ 
 } 
-
-
-
-
